@@ -24,12 +24,12 @@ Comenzaremos justo antes del apartado 6.7. Encabezados API de Linux-4.9.9 del li
 # Dependencias de Pacman
 
 Pacman depende de los siguientes paquetes:
-
+<pre>
 zlib
 libarchive
 pkg-config
 fakeroot, que a su vez depende de libcap
-
+</pre>
 La mayoría de estos no forman parte del libro LFS, así que descargue sus fuentes manualmente:
 <pre>
 wget https://www.libarchive.org/downloads/libarchive-3.3.2.tar.gz
