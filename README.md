@@ -19,16 +19,15 @@ He aquí una guía para la instalación de Pacman en Linux From Scrach
 
 Instalación de pacman en su cadena de herramientas temporal
 
-Comenzaremos justo antes del apartado 6.7. Encabezados API de Linux-4.9.9 del libro LFS 12.4.
+Comenzaremos justo despues de Meson-1.8.3 en el capítulo 8 del libro LFS 12.4.
 
 # Dependencias de Pacman
 
 Pacman depende de los siguientes paquetes:
 <pre>
-zlib
 libarchive
-pkg-config
-fakeroot, que a su vez depende de libcap
+libfakeroot
+fakeroot
 </pre>
 La mayoría de estos no forman parte del libro LFS, así que descargue sus fuentes manualmente:
 <pre>
