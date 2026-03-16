@@ -214,7 +214,7 @@ Tuve que usar --force al instalar este paquete, ya que algunas bibliotecas ya ex
 
 6.28. Shadow-4.5 Ejecuté passwd manualmente.
 
-6.34. Bash-4.4 Al crear el paquete, makepkg me dijo que "El paquete contiene una referencia a $srcdir". Usando grep -R "$(pwd)/src" pkg/, descubrí que Bash instala Makefile.inc en /usr/lib/bash/, que contiene una referencia al directorio de compilación. En una instalación existente de Arch Linux, /usr/lib/bash/Makefile.inc también contenía una referencia a un directorio de compilación (inexistente), así que supongo que esto es inofensivo.
+6.34. Bash-4.4 Al crear el paquete, makepkg me dijo que "El paquete contiene una referencia a $srcdir". Usando <em>grep -R "$(pwd)/src" pkg/</em>, descubrí que Bash instala Makefile.inc en /usr/lib/bash/, que contiene una referencia al directorio de compilación. En una instalación existente de Arch Linux, <em>/usr/lib/bash/Makefile.inc </em>también contenía una referencia a un directorio de compilación (inexistente), así que supongo que esto es inofensivo.
 
 Utilice --force para instalar este paquete, ya que /bin/bash se creó como parte de la versión 6.6. Creación de archivos y enlaces simbólicos esenciales.
 
