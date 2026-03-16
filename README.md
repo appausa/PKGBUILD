@@ -29,29 +29,33 @@ zlib
 libarchive
 pkg-config
 fakeroot, que a su vez depende de libcap
-La mayoría de estos no forman parte del libro LFS, así que descargue sus fuentes manualmente:
 
+La mayoría de estos no forman parte del libro LFS, así que descargue sus fuentes manualmente:
+<pre>
 wget https://www.libarchive.org/downloads/libarchive-3.3.2.tar.gz
 wget http://turul.canonical.com/pool/main/f/fakeroot/fakeroot_1.22.orig.tar.bz2
 wget https://sources.archlinux.org/other/pacman/pacman-5.0.2.tar.gz
+</pre>
 Compila estos paquetes con el comando siguiente. Al igual que el libro LFS, estos comandos suponen que ha extraído las fuentes relevantes y las ha guardado en el directorio resultante.
 
 zlib 1.2.11
-
+<pre>
 ./configure --prefix=/tools
 
 make
 
 make install
+</pre>
 libarchive 3.3.2
-
+<pre>
 ./configure --prefix=/tools --without-xml2 --disable-shared
 
 make
 
 make install
+</pre>
 pkg-config 0.29.2
-
+<pre>
 ./configure --prefix=/tools            \
             --with-internal-glib       \
             --disable-compile-warnings \
@@ -62,22 +66,25 @@ pkg-config 0.29.2
 make
 
 make install
+</pre>
 libcap 2.25
-
+<pre>
 make
 
 make RAISE_SETFCAP=no lib=lib prefix=/tools install
 
 chmod -v 755 /tools/lib/libcap.so
+</pre>
 fakeroot 1.22
-
+<pre>
 ./configure --prefix=/tools                 \
             --libdir=/tools/lib/libfakeroot \
             --with-ipc=sysv
 make
 make install
+</pre>
 Pacman 5.0.2
-
+<pre>
 ./configure --prefix=/tools   \
             --disable-doc     \
             --disable-shared  \
@@ -87,33 +94,39 @@ Pacman 5.0.2
 make
 
 make install
+</pre>
 Esto habrá instalado, entre otros, los archivos de configuración makepkg.conf y pacman.conf en /etc; es posible que desee editarlos. Para makepkg.conf, asegúrese de que CARCH y CHOST sean apropiados, por ejemplo:
-
+<pre>
 CARCH="x86_64"
 CHOST="x86_64-pc-linux-gnu"
+</pre>
 Puede configurar su nombre y dirección de correo electrónico como PACKAGER si lo desea.
 
 Configurando para construir paquetes con pacman
 
 Cree un nuevo usuario agregando lo siguiente a /etc/passwd:
-
+<pre>
 adalberto:x:1000:999:adalberto:/home/adalberto:/bin/bash
+</pre>
 Donde 999 es el ID del grupo de usuarios. Verifique /etc/group para obtener el ID correcto o, si los usuarios no están presentes en ese archivo, agregue lo siguiente.
-
+<pre>
 users:x:999:
+</pre>
 Crea el directorio home:
-
+<pre>
 mkdir -v /home/adalberto 
 
 chown -Rv adalberto:adalberto /home/adalberto 
+</pre>
 Salga de su chroot actual, luego ingrese a su nuevo usuario (asegúrese de que 1000, 999 y adalberto estén configurados con los valores adecuados para su sistema):
-
+<pre>
 chroot --userspec=1000:999 "$LFS" /tools/bin/env -i \
      HOME=/home/adalberto  \
      TERM="$TERM"          \
      PS1='$? \u:\w \$ '    \
      PATH=/bin:/usr/bin:/sbin:/usr/sbin:/tools/bin:/tools/sbin      \
      /tools/bin/bash --login +h
+</pre>
 Es posible que desee crear un directorio de compilaciones en su directorio de inicio. Allí, luego creará un directorio para cada paquete que esté creando.
 
 Instalación de pacman con pacman
@@ -125,23 +138,26 @@ Descargar los archivos necesario para construir los (PKGBUILD, makepkg.conf y pa
 Edits los archivos PKGBUILD:
 
 Comentario fuera del grupos y dependencias de líneas. Ojo no utilice los paquetes de Arch Linux, y porque lfs es diferente a Arch Linux, pacman no debe tener dependencias de Arch Linux para intalarlo. Editar la fuente variable a Arch, sólo la fuente de pacman tarball (no el url) y el tres descargar archivos se actual. cambio el configurar llamar en el construir que funcionen:
-
+<pre>
 ./configure              
     --prefix=/tools      \
     --sysconfdir=/etc    \
     --localstatedir=/var \
     --disable-doc        \
     --disable-shared
+</pre>
 comentamos que esta fuera de comprobar función; el pruebas no correr sin Pyton.
 
 Now run the following command as your non-root user from the build directory: Ahora corre el siguiente comando como el usuario root para construir el directorio:
-
+<pre>
 makepkg --skipchecksums
+</pre>
 Puedes saltar la seguridad de comprobación porque nosotros no tener instalado OpenSSL aún.
 
 si todo va bien, este debería tener creado un archivo que usted puede ahora instalar lo sigue, como root ahora:
-
+<pre>
 pacman -U pacman-5.0.2-2-x86_64.pkg.tar.gz
+</pre>
 Instalando paquetes del capítulo seis de el libro LFS ahora al continuar con el descansaremos del libro, porque en vez de intalar paquetes manualmente lo aremos con pacman desde el capítulo seis de el Libro LFS.
 
 Todo lo que necesita es que puedas encontrar los archivos PKGBUILD en el directorio packages, pero si quieres leer o crear estos, le sugiero que busque solo referencia de el sitio arch.
@@ -162,8 +178,9 @@ Run makepkg --skipchecksums.
 Comprueba el contenido del directorio pkg, que es el que pacman Create, y de esta forma puede verlo.
 
 Instalar el paquete (como root) con
-
+<pre>
 pacman -u $ nombre de archivo
+</pre>
 Al escribir o editar el archivo PKGBUILD pode tener errores. Es importante que usted aga una copia del libro LFS, copie y pegue lo que necesita para el archivo PKGBUILD, pero no será fácil esto porque la configuración de PKGBUILD es un poco difernte del libro.
 
 Si estas con dudas, puedes buscar información en los repo de Arch Linux, en este github.com.
