@@ -31,75 +31,91 @@ fakeroot
 </pre>
 La mayoría de estos no forman parte del libro LFS, así que descargue sus fuentes manualmente:
 <pre>
-wget https://www.libarchive.org/downloads/libarchive-3.3.2.tar.gz
-wget http://turul.canonical.com/pool/main/f/fakeroot/fakeroot_1.22.orig.tar.bz2
-wget https://sources.archlinux.org/other/pacman/pacman-5.0.2.tar.gz
+wget https://github.com/libarchive/libarchive/releases/download/v3.7.4/libarchive-3.7.4.tar.xz
+wget https://deb.debian.org/debian/pool/main/f/fakeroot/libfakeroot_1.36.orig.tar.gz
+wget https://deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.36.orig.tar.gz
+wget https://sources.archlinux.org/other/pacman/pacman-6.0.2.tar.xz
 </pre>
 Compila estos paquetes con el comando siguiente. Al igual que el libro LFS, estos comandos suponen que ha extraído las fuentes relevantes y las ha guardado en el directorio resultante.
 
-# zlib 1.2.11
-<pre>
-./configure --prefix=/tools
-
-make
-
-make install
-</pre>
 # libarchive 3.3.2
 <pre>
-./configure --prefix=/tools --without-xml2 --disable-shared
+tar -xf libarchive-3.7.4.tar.xz
+cd libarchive-3.7.4
 
+./configure --prefix=/usr 
 make
-
+    
 make install
+
+ln -sfv bsdunzip /usr/bin/unzip
+    
+cd ..
+rm -rf libarchive-3.7.4
 </pre>
-# pkg-config 0.29.2
+# libfakeroot 1.36
 <pre>
-./configure --prefix=/tools            \
-            --with-internal-glib       \
-            --disable-compile-warnings \
-            --disable-host-tool        \
-            --disable-shared           \
-            --docdir=/tools/share/doc/
+tar -xf libfakeroot_1.36.orig.tar.gz
+cd libfakeroot_1.36.orig
+    
+./configure --prefix=/usr 
 
-make
-
-make install
-</pre>
-# libcap 2.25
-<pre>
-make
-
-make RAISE_SETFCAP=no lib=lib prefix=/tools install
-
-chmod -v 755 /tools/lib/libcap.so
-</pre>
-# fakeroot 1.22
-<pre>
-./configure --prefix=/tools                 \
-            --libdir=/tools/lib/libfakeroot \
-            --with-ipc=sysv
 make
 make install
+    
+cd ..
+rm -rf libfakeroot_1.36.orig   
 </pre>
-# Pacman 5.0.2
+# fakeroot 1.36
 <pre>
+tar -xf fakeroot_1.36.orig.tar.gz
+cd fakeroot_1.36.orig
+
+patch -p1 -i fakeroot-1.36-glibc-2.42-fix-1.patch
+patch -p1 -i fakeroot-1.36-glibc-2.42-fix-2.patch
+patch -p1 -i fakeroot-1.36-glibc-2.42-fix-3.patch
+
+# No intalar la documwntacion
+sed -i 's/SUBDIRS=doc \(.*\)/SUBDIRS=\1/' Makefile.am
+
+./bootstrap
+
+./configure --prefix=/usr       \
+  --libdir=/usr/lib/libfakeroot \
+  --disable-static              \
+  --with-ipc=sysv
+
+make
+make install
+
+install -dm0755 "/etc/ld.so.conf.d/"
+echo '/usr/lib/libfakeroot' > "/etc/ld.so.conf.d/fakeroot.conf"
+     
+cd ..
+rm -rf fakeroot_1.36.orig
+</pre>
+# Pacman 6.0.2
+<pre>
+tar -xvf pacman-6.0.2.tar.xz
+cd pacman-6.0.2
+    
 ./configure --prefix=/tools   \
             --disable-doc     \
             --disable-shared  \
             --sysconfdir=/etc \
             --localstatedir=/var
-
 make
-
 make install
+  
+cd ..
+rm -rf pacman-6.0.2  
 </pre>
 Esto habrá instalado, entre otros, los archivos de configuración makepkg.conf y pacman.conf en /etc; es posible que desee editarlos. Para makepkg.conf, asegúrese de que CARCH y CHOST sean apropiados, por ejemplo:
 <pre>
 CARCH="x86_64"
 CHOST="x86_64-pc-linux-gnu"
 </pre>
-Puede configurar su nombre y dirección de correo electrónico como PACKAGER si lo desea.
+Puede configurar su nombre y dirección de correo electrónico como PACKAGE si lo desea.
 
 Configurando para construir paquetes con pacman
 
@@ -130,7 +146,7 @@ Es posible que desee crear un directorio de compilaciones en su directorio de in
 
 Instalación de pacman con pacman
 
-copia las fuentes de pacman en su directorio build, ~/build/pacman-5.0.2.
+copia las fuentes de pacman en su directorio build, ~/build/pacman-6.0.2.
 
 Descargar los archivos necesario para construir los (PKGBUILD, makepkg.conf y pacman.conf.x86_64) desde Arch Linux, paquetes repo a construir en el directorio.
 
@@ -157,7 +173,7 @@ si todo va bien, este debería tener creado un archivo que usted puede ahora ins
 <pre>
 pacman -U pacman-5.0.2-2-x86_64.pkg.tar.gz
 </pre>
-Instalando paquetes del capítulo seis de el libro LFS ahora al continuar con el descansaremos del libro, porque en vez de intalar paquetes manualmente lo aremos con pacman desde el capítulo seis de el Libro LFS.
+Instalando paquetes del capítulo ocho de el libro LFS ahora al continuar con el descansaremos del libro, porque en vez de intalar paquetes manualmente lo aremos con pacman desde el capítulo ocho de el Libro LFS.
 
 Todo lo que necesita es que puedas encontrar los archivos PKGBUILD en el directorio packages, pero si quieres leer o crear estos, le sugiero que busque solo referencia de el sitio arch.
 
@@ -172,8 +188,9 @@ Crea um nuevo directorio en el directorio builds.
 Copia todo los paquetes y parches que necesites (archivos fuentes, y otros posibles archivos, parches o archivos de configuración).
 
 Escribe las archivos PKGBUILD.
-
+<pre>
 Run makepkg --skipchecksums.
+</pre>
 Comprueba el contenido del directorio pkg, que es el que pacman Create, y de esta forma puede verlo.
 
 Instalar el paquete (como root) con
@@ -195,7 +212,7 @@ Esto es por qué el primero paso de cada función voluntarias usualmente es cd e
 
 Instalando paquetes La instalación de los archivos, no se puede instalar en el sistema raíz, pero en su lugar usted intalara en ${pkgdir}. Para cierto paquetes ponerce en destdir = ${pkgdir} instalar en vez de make install. No todo paquetes usan destdir, sin embargo. Si usted está no seguro cómo aquellos paquetes debería ser construido, usted puede siempre comprobar en Arch Linux los paquetes o el PKGBUILDs de este reporte.
 
-En algunos casos, el libro le dera que mueva un directorio. Mientras trabsja con la creación de los paquetes, Pero pude provocar problemas cuando los intale. Debes crear primero un directorio con permiso -vdm755 $dir_name.
+En algunos casos, el libro le dera que mueva un directorio. Mientras trabaja con la creación de los paquetes, Pero pude provocar problemas cuando los intale. Debes crear primero un directorio con permiso -vdm755 $dir_name.
 
 # Post-install Pacman ejecuta las funciones he intala los archivos.
 
@@ -210,40 +227,17 @@ I did these steps manually. It didn't Realicé estos pasos manualmente. No me pa
 # 6.15. Bc-1.07.1 
 El libro indica que se deben crear enlaces simbólicos para libncurses. Lo hice manualmente antes de compilar el paquete.
 
-# 6.20. GCC-7.2.0 
-Antes de compilar el paquete, aumente el tamaño de la pila: ulimit -s 32768.
-
-Tuve que usar --force al instalar este paquete, ya que algunas bibliotecas ya existían en el sistema.
-
-# 6.28. Shadow-4.5 
-Ejecuté passwd manualmente.
-
 # 6.34. Bash-4.4 Al 
 crear el paquete, makepkg me dijo que "El paquete contiene una referencia a $srcdir". Usando <em>grep -R "$(pwd)/src" pkg/</em>, descubrí que Bash instala Makefile.inc en /usr/lib/bash/, que contiene una referencia al directorio de compilación. En una instalación existente de Arch Linux, <em>/usr/lib/bash/Makefile.inc </em>también contenía una referencia a un directorio de compilación (inexistente), así que supongo que esto es inofensivo.
 
-Utilice --force para instalar este paquete, ya que /bin/bash se creó como parte de la versión 6.6. Creación de archivos y enlaces simbólicos esenciales.
-
 Luego volví a aplicar chroot, usando /bin/bash en lugar de /tools/bin/bash.
-
-# 6.40. Perl-5.26.0 
-El manual de LFS indica que se cree el archivo /etc/hosts. He optado por hacerlo manualmente, en lugar de que el paquete Perl lo instale. No parece lógico que Perl sea el propietario de este archivo. Como referencia, en Arch Linux, el archivo hosts pertenece al paquete del sistema de archivos, que contiene los archivos base de Arch Linux, por lo que tiene sentido que se cree manualmente en el caso de LFS.
-
-Utilice --force para instalar este paquete, ya que /usr/bin/perl se creó como parte de la versión 6.6. Creación de archivos y enlaces simbólicos esenciales.
-
-# 6.50. Coreutils-8.27 
-Por alguna razón, al ejecutar sed in situ (sed -i) en chroot.8, el archivo obtuvo permisos 000. Lo reemplacé con un sed normal, redirigiendo el resultado a un nuevo archivo, y luego usé install para copiar el archivo a su destino.
-
-Utilice --force para instalar este paquete, ya que existen varios archivos (entre otros, cat, dd, echo) en /bin (como enlaces simbólicos a /tools). Estos se añadieron en la versión 6.6, sección «Creación de archivos y enlaces simbólicos esenciales».
-
-# 6.53. Findutils-4.6.0 
-Al igual que con coreutils, usar sed en el lugar estableció los permisos a 000, así que usé la misma solución alternativa aquí.
 
 # 6.63. Sysklogd-1.5.1 
 El archivo makefile de Sysklogd no admite la especificación de un directorio de destino durante la instalación (make DESTDIR=/ruta). He incluido un parche que añade esta funcionalidad.
 
 Etapa 4: Instalación de pacman en el sistema final. La etapa cuatro comienza inmediatamente después del último paquete del capítulo seis, que actualmente es vim. Antes de continuar con el resto del capítulo, compile e instale pacman y sus dependencias.
 
-Como parte del capítulo seis, ya deberías haber instalado la mayoría de estos paquetes, excepto:
+Como parte del capítulo ocho, ya deberías haber instalado la mayoría de estos paquetes, excepto:
 
 libarchive fakeroot pacman Utilice su instalación temporal de pacman para instalarlos. Recuerde, estamos instalando en el sistema final, no en /tools.
 
