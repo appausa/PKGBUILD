@@ -31,7 +31,7 @@ fakeroot
 La mayoría de estos no forman parte del libro LFS, así que descargue sus fuentes manualmente:
 <pre>
 wget https://github.com/libarchive/libarchive/releases/download/v3.7.4/libarchive-3.7.4.tar.xz
-wget https://deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.37.orig.tar.gz
+wget http://deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.37.1.1.orig.tar.gz
 wget https://sources.archlinux.org/other/pacman/pacman-6.0.2.tar.xz
 </pre>
 Compila estos paquetes con el comando siguiente. Al igual que el libro LFS, estos comandos suponen que ha extraído las fuentes relevantes y las ha guardado en el directorio resultante.
